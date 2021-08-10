@@ -3,31 +3,12 @@ const api = express.Router()
 
 const mongoose = require('mongoose')
 const User = require('../models/user')
-
-const { generateAccessToken } = require('./auth')
+const Room = require('../models/room')
+const { generateAccessToken, authenticateToken } = require('./auth')
 
 const to = require('await-to-js').default
 
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
 
-    if (token == null) return res.sendStatus(401)
-
-    jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
-        console.log(err)
-
-        if (err) return res.sendStatus(403)
-        console.log('JWWWWWWWWWT', user)
-        req.user = user
-
-        next()
-    })
-}
-
-
-
-//api.use('/login', authenticateToken)
 
 api.post('/signup', async (req, res) => {
     const email = req.body.email
@@ -97,4 +78,43 @@ api.post('/login', async (req, res) => {
     })
 
 })
-module.exports = api
+
+api.get('/getCurrentUser', authenticateToken, async (req, res) => {
+    console.log(req.user)
+    res.json({ username: req.user.username })
+})
+module.exports = (io) => {
+    io.on('connection', async (socket) => {
+        console.log('New Web Socket Connection');
+
+        socket.on('joinRoom', async ({ username, room }) => {
+            socket.join(room)
+            // Welcome current user
+            socket.emit('serverMessage', 'Welcome to Chatter')
+            const messages = (await Room.findOne({ name: room })).messages
+            console.log(messages)
+
+            socket.emit('getRoomMessages', messages)
+            // Broadcast when a user connects
+            socket.broadcast.to(room).emit('serverMessage', `${username} user has joined the chat`)
+
+            // Runs when a client disconnects
+            socket.on('disconnect', () => io.to(room).emit('serverMessage', `${username} has left the chat`))
+
+            // Listen for a chat message
+            socket.on('chatMessage', async (message) => {
+                let thisRoom = await Room.findOne({ name: room })
+                console.log('before', thisRoom.messages)
+                thisRoom.messages.push(message)
+                console.log('after', thisRoom.messages)
+                await thisRoom.save()
+                io.to(room).emit('chatMessage', message)
+            })
+
+            socket.on('serverMessage', msg => io.to(room).emit('serverMessage', msg))
+        })
+
+
+    })
+    return api
+}

@@ -19,6 +19,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.6",
     "morgan": "^1.10.0",
+    "session": "^0.1.0",
     "socket.io": "^4.1.3"
   }
 }

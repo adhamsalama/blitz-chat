@@ -9,12 +9,11 @@ dotenv.config()
 // The piece of data that you hash in your token can be something either a user ID or username or a much more complex object. In either case, it should be an identifier for a specific user.
 
 function generateAccessToken(id) {
-    return jwt.sign({ id: id }, '' + process.env.TOKEN_SECRET, { expiresIn: '1800s' })
+    return jwt.sign({ id: id }, '' + process.env.TOKEN_SECRET, { expiresIn: '24h' })
 }
 
 function authenticateToken(req, res, next) {
     const token = req.cookies['token']
-    console.log('this is our token', token);
     if (token == null) return res.sendStatus(401)
 
     jwt.verify(token, '' + process.env.TOKEN_SECRET, (err, user) => {
@@ -22,8 +21,8 @@ function authenticateToken(req, res, next) {
         if (err) return res.sendStatus(403)
         console.log(user, user['id'])
         User.findById(user['id'], (err, user) => {
-            console.log(user)
             req.user = user
+            res.locals.currentUser = req.user
             next()
         })
     })

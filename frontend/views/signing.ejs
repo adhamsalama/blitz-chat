@@ -69,12 +69,12 @@
                 password: loginForm.querySelector('#login-password').value
             })
                 .then(response => {
-                    alert('LOGING IN')
                     // Login successful
                     if (response.status == 200) {
                         console.log(response)
                         // Store JWT
                         document.cookie = `token=${response.data}`
+                        document.location = 'http://127.0.0.1:3000/index'
                     }
                 })
                 .catch(err => console.log('Login error', err.response))
