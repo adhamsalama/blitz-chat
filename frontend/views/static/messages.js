@@ -8,16 +8,16 @@ function outputChatMessage(message, currentUsername) {
     // This user sent it
     if (message.username == currentUsername) {
         chat.innerHTML += `<div class="alert alert-success text-end" role="alert">
-                Me - ${message.date}
+                Me - ${new Date(message.date).toLocaleString()}
                 <br>
-                ${message.msg}
+                ${marked(message.msg)}
             </div>`
     }
     else {
         chat.innerHTML += `<div class="alert alert-primary" role="alert">
-                ${message.username} - ${message.date}
+                ${message.username} - ${new Date(message.date).toLocaleString()}
                 <br>
-                ${message.msg}
+                ${marked(message.msg)}
             </div>`
     
     }
