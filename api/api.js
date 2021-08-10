@@ -85,28 +85,49 @@ api.get('/getCurrentUser', authenticateToken, async (req, res) => {
 })
 module.exports = (io) => {
     io.on('connection', async (socket) => {
+        io.sockets
         console.log('New Web Socket Connection');
-
         socket.on('joinRoom', async ({ username, room }) => {
             socket.join(room)
+            
             // Welcome current user
             socket.emit('serverMessage', 'Welcome to Chatter')
+            
+            // Add user to user list
+            if(!io.sockets.adapter.rooms.get(room).users) {
+                io.sockets.adapter.rooms.get(room).users = []
+            }
+            io.sockets.adapter.rooms.get(room).users.push(username)
+
+            // Send list of users
+            io.to(room).emit('sendUsers', io.sockets.adapter.rooms.get(room).users)
+            
+            console.log(io.sockets.adapter.rooms.get(room).users)
+
+            //io.sockets.adapter.rooms.get('room').users.push(username)
             const messages = (await Room.findOne({ name: room })).messages
-            console.log(messages)
 
             socket.emit('getRoomMessages', messages)
             // Broadcast when a user connects
             socket.broadcast.to(room).emit('serverMessage', `${username} user has joined the chat`)
 
             // Runs when a client disconnects
-            socket.on('disconnect', () => io.to(room).emit('serverMessage', `${username} has left the chat`))
+            socket.on('disconnect', () => {
+                io.to(room).emit('serverMessage', `${username} has left the chat`)
+                // Remove username from list of users and send the rest if room still open
+                if (io.sockets.adapter.rooms.get(room)) {
+                    io.sockets.adapter.rooms.get(room).users.splice(io.sockets.adapter.rooms.get(room).users.indexOf(username), 1)
+                    io.to(room).emit('sendUsers', io.sockets.adapter.rooms.get(room).users)
+                }
+                    
+                //console.log(io.sockets.adapter.rooms.get(room).users)
+            })
 
             // Listen for a chat message
             socket.on('chatMessage', async (message) => {
                 let thisRoom = await Room.findOne({ name: room })
-                console.log('before', thisRoom.messages)
+                console.log(thisRoom)
                 thisRoom.messages.push(message)
-                console.log('after', thisRoom.messages)
                 await thisRoom.save()
                 io.to(room).emit('chatMessage', message)
             })

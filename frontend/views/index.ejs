@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,14 +10,28 @@
 
     <title>Index</title>
 </head>
-<body class="container justify-content-center">
-    <h1>Hello, <%= currentUser.username %></h1>
 
-    <ul>
-        <% rooms %>
-    <% rooms.forEach(function(room) { %>
-        <li><a href="/rooms/<%= room.name %>"><%= room.name %></a></li>
-    <% }) %>    
-    </ul>
+<body class="container justify-content-center">
+    <h1>Hello, <%= currentUser.username %>
+    </h1>
+    <div class="row row-cols-lg-2 row-cols-sm-1">
+        <% rooms.forEach(function(room) { %>
+            <div class="col">
+                <div class="card text-center mb-4">
+                    <h5 class="card-header">
+                        <%= room.name %>
+                    </h5>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <%= room.description %>
+                        </p>
+                        <a href="/rooms/<%= room.name %>" class="btn btn-primary">Join Room</a>
+                    </div>
+                </div>
+            </div>
+            
+        <% }) %>
+    </div>
 </body>
+
 </html>

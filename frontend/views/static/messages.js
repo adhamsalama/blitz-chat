@@ -36,7 +36,7 @@ function formatMessage(username, msg) {
     return {
         username: username,
         msg: msg,
-        date: new Date().toJSON()
+        date: new Date().toUTCString()
     }
 }
 
