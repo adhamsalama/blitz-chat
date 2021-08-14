@@ -1,0 +1,18 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+    /*flex-wrap: wrap;*/
+    align-items: stretch;
+
+}
+
+.flex-container > .card {
+    width: 100%;
+}
+
+/* Responsive layout - makes a one column layout instead of a two-column layout */
+@media (max-width: 900px) {
+    .flex-container {
+      flex-direction: column;
+    }
+  }
