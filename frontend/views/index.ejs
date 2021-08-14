@@ -7,17 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="http://127.0.0.1:3000/styles.css">
     <title>Index</title>
 </head>
 
 <body class="container justify-content-center">
     <h1>Hello, <%= currentUser.username %>
     </h1>
-    <div class="row row-cols-lg-2 row-cols-sm-1">
+    <form id="search-form">
+        <div class="mb-3 mx-auto">
+            <label for="q" class="form-label">Search Public Rooms</label>
+            <input type="text" class="form-control" id="search-public-rooms">
+        </div>
+    </form>
+    <div class="flex-container rooms">
         <% rooms.forEach(function(room) { %>
-            <div class="col">
-                <div class="card text-center mb-4">
+                <div class="card text-center m-1" style="display: inline-block;">
                     <h5 class="card-header">
                         <%= room.name %>
                     </h5>
@@ -28,10 +33,12 @@
                         <a href="/rooms/<%= room.name %>" class="btn btn-primary">Join Room</a>
                     </div>
                 </div>
-            </div>
             
         <% }) %>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="http://127.0.0.1:3000/searchPublicRooms.js"></script>
+
 </body>
 
 </html>

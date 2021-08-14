@@ -83,9 +83,17 @@ api.get('/getCurrentUser', authenticateToken, async (req, res) => {
     console.log(req.user)
     res.json({ username: req.user.username })
 })
+
+api.get('/rooms/search', authenticateToken, async (req, res) => {
+    let q = req.query['q']
+    const rooms = await Room.find({name: {$regex: q, $options: 'i'}}).select('name description -_id')
+    res.json(rooms)
+})
+
+
+
 module.exports = (io) => {
     io.on('connection', async (socket) => {
-        io.sockets
         console.log('New Web Socket Connection');
         socket.on('joinRoom', async ({ username, room }) => {
             socket.join(room)
@@ -108,8 +116,20 @@ module.exports = (io) => {
             const messages = (await Room.findOne({ name: room })).messages
 
             socket.emit('getRoomMessages', messages)
+
             // Broadcast when a user connects
             socket.broadcast.to(room).emit('serverMessage', `${username} user has joined the chat`)
+            
+            // Listen for a chat message
+            socket.on('chatMessage', async (message) => {
+                let thisRoom = await Room.findOne({ name: room })
+                console.log(thisRoom)
+                thisRoom.messages.push(message)
+                thisRoom.save()
+                io.to(room).emit('chatMessage', message)
+            })
+
+            socket.on('serverMessage', msg => io.to(room).emit('serverMessage', msg))
 
             // Runs when a client disconnects
             socket.on('disconnect', () => {
@@ -123,16 +143,6 @@ module.exports = (io) => {
                 //console.log(io.sockets.adapter.rooms.get(room).users)
             })
 
-            // Listen for a chat message
-            socket.on('chatMessage', async (message) => {
-                let thisRoom = await Room.findOne({ name: room })
-                console.log(thisRoom)
-                thisRoom.messages.push(message)
-                await thisRoom.save()
-                io.to(room).emit('chatMessage', message)
-            })
-
-            socket.on('serverMessage', msg => io.to(room).emit('serverMessage', msg))
         })
 
 
