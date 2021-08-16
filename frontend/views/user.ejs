@@ -1,0 +1,20 @@
+<%- include('_header') %>
+
+    <h1 id="username"></h1>
+    <h2 id="email"></h2>
+    <button id="add-friend" class="btn btn-primary">Add Friend</button>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const username = location.pathname.split('/')[2]
+        axios.get(`http://127.0.0.1:3000/api/users/${username}`).then(res => {
+            document.title = res.data.username
+            document.querySelector('#username').innerHTML = res.data.username
+            document.querySelector('#email').innerHTML = res.data.email
+        })
+        document.querySelector('#add-friend').onclick = () => {
+            axios.post(`http://127.0.0.1:3000/api/users/${username}/add-friend`)
+            .then(res => console.log(res))
+        }
+    </script>
+
+<%- include('_footer') %>
