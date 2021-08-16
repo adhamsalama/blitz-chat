@@ -84,12 +84,49 @@ api.get('/getCurrentUser', authenticateToken, async (req, res) => {
     res.json({ username: req.user.username })
 })
 
+api.get('/user-rooms', authenticateToken, async (req, res) => {
+    res.json({ rooms: await Room.find({creator: req.user.username}) })
+})
+
 api.get('/rooms/search', authenticateToken, async (req, res) => {
     let q = req.query['q']
-    const rooms = await Room.find({name: {$regex: q, $options: 'i'}}).select('name description -_id')
+    const rooms = await Room.find({ name: { $regex: q, $options: 'i' } }).select('name description -_id')
     res.json(rooms)
 })
 
+api.get('/rooms', authenticateToken, async (req, res) => {
+    res.json({rooms: await Room.find({type: 'public'})})
+})
+
+api.post('/rooms', authenticateToken, async (req, res) => {
+    console.log(req.body)
+    Room.create({
+        name: req.body.name,
+        type: req.body.type,
+        creator: req.user.username,
+        description: req.body.description,
+        tags: req.body.tags
+    }, (err, data) => {
+        if (err) {
+            if (err.code == 11000) { // duplicate
+                console.log('duplicate')
+                res.status(409).json('Room name already taken.')
+                return
+            }
+        }
+        else {
+            res.sendStatus(201)
+        }
+    })
+    //res.sendStatus(201)
+})
+api.get('/users/:username', async (req, res) => {
+    const username = req.params.username
+    const user = await User.findOne({ username: username }).select('username email -_id')
+    console.log(user)
+    res.header("Access-Control-Allow-Origin", "*");
+    res.json(user)
+})
 
 
 module.exports = (io) => {
@@ -97,19 +134,19 @@ module.exports = (io) => {
         console.log('New Web Socket Connection');
         socket.on('joinRoom', async ({ username, room }) => {
             socket.join(room)
-            
+
             // Welcome current user
             socket.emit('serverMessage', 'Welcome to Chatter')
-            
+
             // Add user to user list
-            if(!io.sockets.adapter.rooms.get(room).users) {
+            if (!io.sockets.adapter.rooms.get(room).users) {
                 io.sockets.adapter.rooms.get(room).users = []
             }
             io.sockets.adapter.rooms.get(room).users.push(username)
 
             // Send list of users
             io.to(room).emit('sendUsers', io.sockets.adapter.rooms.get(room).users)
-            
+
             console.log(io.sockets.adapter.rooms.get(room).users)
 
             //io.sockets.adapter.rooms.get('room').users.push(username)
@@ -119,7 +156,7 @@ module.exports = (io) => {
 
             // Broadcast when a user connects
             socket.broadcast.to(room).emit('serverMessage', `${username} user has joined the chat`)
-            
+
             // Listen for a chat message
             socket.on('chatMessage', async (message) => {
                 let thisRoom = await Room.findOne({ name: room })
@@ -139,7 +176,7 @@ module.exports = (io) => {
                     io.sockets.adapter.rooms.get(room).users.splice(io.sockets.adapter.rooms.get(room).users.indexOf(username), 1)
                     io.to(room).emit('sendUsers', io.sockets.adapter.rooms.get(room).users)
                 }
-                    
+
                 //console.log(io.sockets.adapter.rooms.get(room).users)
             })
 
