@@ -1,13 +1,14 @@
 .flex-container {
     display: flex;
     justify-content: center;
-    /*flex-wrap: wrap;*/
+    flex-wrap: wrap;
     align-items: stretch;
+    width: 100%;
 
 }
 
-.flex-container > .card {
-    width: 100%;
+.flex-container>* {
+  flex: 1 1 30%;
 }
 
 /* Responsive layout - makes a one column layout instead of a two-column layout */
