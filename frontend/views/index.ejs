@@ -1,44 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('_header') %>
+    <h2>Create a room</h2>
+    <form id="create-room">
+        <input type="text" id="room-name" class="form-control" placeholder="Name">
+        <select id="room-type" class="form-control">
+            <option value="" selected disabled>Type</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+        </select>
+        <textarea id="room-description" class="form-control" placeholder="Description" cols="20" rows="5"></textarea>
+        <input type="text" id="room-tags" class="form-control" placeholder="Tags">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+    <h1>Your Rooms</h1>
+    <div id="user-rooms" class="flex-container rooms">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <link rel="stylesheet" href="http://127.0.0.1:3000/styles.css">
-    <title>Index</title>
-</head>
-
-<body class="container justify-content-center">
-    <h1>Hello, <%= currentUser.username %>
-    </h1>
+    </div>
+    <h1>Public Rooms</h1>
     <form id="search-form">
         <div class="mb-3 mx-auto">
             <label for="q" class="form-label">Search Public Rooms</label>
             <input type="text" class="form-control" id="search-public-rooms">
         </div>
     </form>
-    <div class="flex-container rooms">
-        <% rooms.forEach(function(room) { %>
-                <div class="card text-center m-1" style="display: inline-block;">
-                    <h5 class="card-header">
-                        <%= room.name %>
-                    </h5>
-                    <div class="card-body">
-                        <p class="card-text">
-                            <%= room.description %>
-                        </p>
-                        <a href="/rooms/<%= room.name %>" class="btn btn-primary">Join Room</a>
-                    </div>
-                </div>
-            
-        <% }) %>
+    <div id="public-rooms" class="flex-container rooms">
     </div>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="http://127.0.0.1:3000/searchPublicRooms.js"></script>
+    <script>
 
-</body>
 
-</html>
+        document.querySelector('#create-room').addEventListener('submit', e => {
+            e.preventDefault()
+            let name = document.querySelector('#room-name')
+            let type = document.querySelector('#room-type')
+            let description = document.querySelector('#room-description')
+            let tags = document.querySelector('#room-tags')
+            axios.post('http://127.0.0.1:3000/api/rooms', {
+                name: name.value,
+                type: type.value,
+                description: description.value,
+                tags: tags.value.split(',')
+            })
+                .then(res => {
+                    alert(res.data)
+                    searchPublicRooms('')
+                })
+                .catch(err => {
+                    console.log(err.response)
+                    if (err.response.status == 409)
+                        alert('Room name already taken.')
+                })
+        })
+
+        // Get and display user rooms
+        axios.get('http://127.0.0.1:3000/api/user-rooms', { withCredentials: true })
+            .then(res => {
+                document.querySelector('#user-rooms').innerHTML = displayRooms(res.data.rooms)
+            })
+
+        // Get and display public rooms
+        axios.get('http://127.0.0.1:3000/api/rooms', { withCredentials: true })
+            .then(res => {
+                document.querySelector('#public-rooms').innerHTML = displayRooms(res.data.rooms)
+            })
+
+
+        function displayRooms(rooms) {
+            let html = ''
+            rooms.forEach(room => {
+
+                html += `<div class="card text-center m-1" style="display: inline-block;">
+                <h5 class="card-header">
+                    ${room.name}
+                </h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        ${room.description}
+                        <br>
+                            Room type: ${room.type}
+                    </p>
+                        <div>
+                            ${displayTags(room.tags)}
+                        </div>
+                        <a href="/rooms/${room.name}" class="btn btn-primary mt-2">Join Room</a>
+                </div>
+                </div>`
+            })
+            return html
+        }
+
+        function displayTags(tags) {
+            let html = ''
+            tags.forEach(tag => {
+                html += `<span class="badge rounded-pill bg-primary">${tag}</span>`
+            })
+            return html
+        }
+
+
+    </script>
+
+    <%- include('_footer') %>
