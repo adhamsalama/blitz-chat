@@ -5,7 +5,19 @@ const roomSchema = mongoose.Schema({
     creator: {type: String, required: true},
     createdAt: {type: Date, default: Date.now},
     description: {type: String},
-    messages: []
+    type: {
+        type: String,
+        enum: ['public', 'private'],
+        default: 'public'
+    },
+    tags: {
+        type: Array,
+        default: []
+    },
+    messages: {
+        type: Array,
+        default: []
+    }
 })
 
 const Room = mongoose.model('Room', roomSchema)
