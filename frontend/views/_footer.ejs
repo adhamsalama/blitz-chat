@@ -1,16 +1,6 @@
 <script>
     document.querySelector('#logout-button').onclick = () => {
         // Delete JWT
-        // let cookies = document.cookie.split(';')
-        // let jwtIndex
-        // for(let i = 0; i < cookies.length; i++) {
-        //     if (cookies[i].includes('jwttoken')) {
-        //         jwtIndex = i
-        //         break
-        //     }
-        // }
-        // cookies.splice(jwtIndex, 1)
-        // // Save cookies
         document.cookie = 'jwttoken='
         // Redirect to login page
         window.location.href = 'http://127.0.0.1:3000/accounts'
