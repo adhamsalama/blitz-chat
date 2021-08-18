@@ -127,6 +127,38 @@ api.get('/users/:username', async (req, res) => {
     res.json(user)
 })
 
+api.post('/admin-command', async (req, res) => {
+    let [roomErr, room] = await to(Room.findOne({ name: req.body.room, creator: req.user.username }))
+    if (roomErr)
+        return res.sendStatus(401)
+    if (!room)
+        return res.status(403).json({ message: "Room doesn't exist" })
+    let [userErr, user] = await to(User.findOne({ username: req.body.username }))
+    if (userErr)
+        return res.sendStatus(401)
+    if (!user)
+        return res.status(401).json({ message: "User doesn't exist" })
+    if (req.body.command == 'add') {
+        // User already in room's user list
+        if (room.users.includes(user.username))
+            return res.status(401).json({ message: 'User already added to room.' })
+        room.users.push(user.username)
+        room.save()
+        return res.status(200).json({message: 'User added successfully.'})
+    }
+    if (req.body.command == 'delete') {
+        let userIndex = room.users.indexOf(user.username)
+        // User not in room's user list
+        if (userIndex < 0)
+            return res.status(401).json({ message: 'User not in room.' })
+        room.users.splice(userIndex, 1)
+        room.save()
+        return res.status(200).json({message: 'User removed successfully.'})
+    }
+
+    res.sendStatus(403)
+})
+
 module.exports = (io) => {
     io.on('connection', async (socket) => {
         console.log('New Web Socket Connection');
