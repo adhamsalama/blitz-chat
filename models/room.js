@@ -17,6 +17,10 @@ const roomSchema = mongoose.Schema({
     messages: {
         type: Array,
         default: []
+    },
+    users: {
+        type: Array,
+        default: []
     }
 })
 
