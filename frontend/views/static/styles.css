@@ -16,4 +16,9 @@
     .flex-container {
       flex-direction: column;
     }
-  }
+}
+
+#chat {
+  overflow-y: auto;
+  max-height: 800px;
+}
