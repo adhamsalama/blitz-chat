@@ -73,8 +73,8 @@
                     if (response.status == 200) {
                         console.log(response)
                         // Store JWT
-                        document.cookie = `token=${response.data}`
-                        document.location = 'http://127.0.0.1:3000/index'
+                        document.cookie = `jwttoken=${response.data}`
+                        document.location = 'http://127.0.0.1:3000'
                     }
                 })
                 .catch(err => console.log('Login error', err.response))

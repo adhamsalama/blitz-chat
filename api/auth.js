@@ -13,13 +13,14 @@ function generateAccessToken(id) {
 }
 
 function authenticateToken(req, res, next) {
-    const token = req.cookies['token']
-    if (token == null) return res.sendStatus(401)
+    const token = req.cookies['jwttoken']
+    if (!token) return res.status(401).redirect('http://127.0.0.1:3000/accounts')
 
     jwt.verify(token, '' + process.env.TOKEN_SECRET, (err, user) => {
 
+        //if (err) return res.sendStatus(403)
         if (err) return res.sendStatus(403)
-        console.log(user, user['id'])
+        //console.log(user, user['id'])
         User.findById(user['id'], (err, user) => {
             req.user = user
             res.locals.currentUser = req.user
