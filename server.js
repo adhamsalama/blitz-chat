@@ -1,6 +1,9 @@
 const path = require('path')
 const express = require('express')
 const app = express()
+const cors = require('cors')
+app.use(cors({origin: '*', optionsSuccessStatus: 200}))
+
 const mongoose = require('mongoose')
 const views = require('./frontend/views')
 const cookieParser = require('cookie-parser')
@@ -22,7 +25,6 @@ mongoose.connect('mongodb://localhost:27017/chatter', {
     // saveUninitialized: true,
     // store: MongoStore.create({mongoUrl: 'mongodb://localhost:27017/chatter'})
 // }))
-
 app.use(require('morgan')('short'))
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
