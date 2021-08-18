@@ -31,3 +31,16 @@
         e.target.elements.chatMessage.focus()
     })
 })()
+
+document.querySelector('.admin-control').addEventListener('submit', e => {
+    e.preventDefault()
+    let commandList = document.querySelector('.command').value.split(' ')
+    console.log(commandList)
+    axios.post('/api/admin-command', {
+        room: location.pathname.split('/')[2],
+        command: commandList[0],
+        username: commandList[1]
+    }, {withCredentials: true})
+    .then(res => console.log(res))
+    .catch(err => console.log(err.response))
+})
