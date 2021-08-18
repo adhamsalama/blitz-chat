@@ -6,12 +6,12 @@ const axios = require('axios').default
 
 const { authenticateToken } = require('../api/auth')
 
-router.get('/', (req, res) => {
+router.get('/accounts', (req, res) => {
     res.render('signing')
 })
 
 
-router.get('/index', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
     const rooms = await Room.find({type: 'public'})
     const userRooms = await Room.find({creator: req.user.username})
     res.render('index', {rooms: rooms, userRooms: userRooms})

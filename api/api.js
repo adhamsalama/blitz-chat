@@ -14,7 +14,6 @@ api.post('/signup', async (req, res) => {
     const email = req.body.email
     const username = req.body.username
     const password = req.body.password
-    console.log(email, username, password);
     let [err, existingUser] = await to(User.findOne({
         $or: [
             { email: email },
@@ -79,26 +78,27 @@ api.post('/login', async (req, res) => {
 
 })
 
-api.get('/getCurrentUser', authenticateToken, async (req, res) => {
-    console.log(req.user)
+api.use(authenticateToken)
+
+api.get('/getCurrentUser', async (req, res) => {
     res.json({ username: req.user.username })
 })
 
-api.get('/user-rooms', authenticateToken, async (req, res) => {
-    res.json({ rooms: await Room.find({creator: req.user.username}) })
+api.get('/user-rooms', async (req, res) => {
+    res.json({ rooms: await Room.find({ creator: req.user.username }) })
 })
 
-api.get('/rooms/search', authenticateToken, async (req, res) => {
+api.get('/rooms/search', async (req, res) => {
     let q = req.query['q']
     const rooms = await Room.find({ name: { $regex: q, $options: 'i' } }).select('name description -_id')
     res.json(rooms)
 })
 
-api.get('/rooms', authenticateToken, async (req, res) => {
-    res.json({rooms: await Room.find({type: 'public'})})
+api.get('/rooms', async (req, res) => {
+    res.json({ rooms: await Room.find({ type: 'public' }) })
 })
 
-api.post('/rooms', authenticateToken, async (req, res) => {
+api.post('/rooms', async (req, res) => {
     console.log(req.body)
     Room.create({
         name: req.body.name,
@@ -124,10 +124,8 @@ api.get('/users/:username', async (req, res) => {
     const username = req.params.username
     const user = await User.findOne({ username: username }).select('username email -_id')
     console.log(user)
-    res.header("Access-Control-Allow-Origin", "*");
     res.json(user)
 })
-
 
 module.exports = (io) => {
     io.on('connection', async (socket) => {
@@ -155,12 +153,11 @@ module.exports = (io) => {
             socket.emit('getRoomMessages', messages)
 
             // Broadcast when a user connects
-            socket.broadcast.to(room).emit('serverMessage', `${username} user has joined the chat`)
+            socket.broadcast.to(room).emit('serverMessage', `${username} has joined the chat`)
 
             // Listen for a chat message
             socket.on('chatMessage', async (message) => {
                 let thisRoom = await Room.findOne({ name: room })
-                console.log(thisRoom)
                 thisRoom.messages.push(message)
                 thisRoom.save()
                 io.to(room).emit('chatMessage', message)
@@ -180,6 +177,11 @@ module.exports = (io) => {
                 //console.log(io.sockets.adapter.rooms.get(room).users)
             })
 
+            // Recieve and emit a user is typing
+
+            socket.on('userTyping', (username) => {
+                socket.broadcast.to(room).emit('userTyping', username)
+            })
         })
 
 
