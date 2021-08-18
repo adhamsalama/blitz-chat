@@ -88,6 +88,12 @@ api.get('/user-rooms', async (req, res) => {
     res.json({ rooms: await Room.find({ creator: req.user.username }) })
 })
 
+api.get('/joined-rooms', async (req, res) => {
+    let rooms = await Room.find({users: req.user.username})
+    console.log(rooms)
+    res.json({rooms: rooms})
+})
+
 api.get('/rooms/search', async (req, res) => {
     let q = req.query['q']
     const rooms = await Room.find({ name: { $regex: q, $options: 'i' } }).select('name description -_id')

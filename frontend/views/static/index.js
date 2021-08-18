@@ -9,7 +9,8 @@ document.querySelector('#create-room').addEventListener('submit', e => {
         type: type.value,
         description: description.value,
         tags: tags.value.split(',')
-    })
+    },
+        { withCredentials: true })
         .then(res => {
             alert(res.data)
             searchPublicRooms('')
@@ -27,6 +28,12 @@ axios.get('http://127.0.0.1:3000/api/user-rooms', { withCredentials: true })
         document.querySelector('#user-rooms').innerHTML = displayRooms(res.data.rooms)
     })
 
+// Get and display joined rooms
+axios.get('http://127.0.0.1:3000/api/joined-rooms', { withCredentials: true })
+    .then(res => {
+        document.querySelector('#joined-rooms').innerHTML = displayRooms(res.data.rooms)
+    })
+
 // Get and display public rooms
 axios.get('http://127.0.0.1:3000/api/rooms', { withCredentials: true })
     .then(res => {
@@ -36,6 +43,8 @@ axios.get('http://127.0.0.1:3000/api/rooms', { withCredentials: true })
 
 function displayRooms(rooms) {
     let html = ''
+    if (rooms.length < 1)
+        return '<h2>No rooms</h2>'
     rooms.forEach(room => {
 
         html += `<div class="card text-center m-1" style="display: inline-block;">
