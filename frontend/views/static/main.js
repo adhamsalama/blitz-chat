@@ -26,7 +26,7 @@
         const msg = e.target.elements.chatMessage.value;
 
         // Emit message to server
-        socket.emit('chatMessage', formatMessage(username, msg), room)
+        socket.emit('chatMessage', formatMessage(username, msg))
         e.target.elements.chatMessage.value = ''
         e.target.elements.chatMessage.focus()
     })
