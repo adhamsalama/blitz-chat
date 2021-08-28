@@ -14,7 +14,7 @@ function outputChatMessage(message, currentUsername) {
             </div>`
     }
     else {
-        chat.innerHTML += `<div class="alert alert-primary" role="alert">
+        chat.innerHTML += `<div class="alert alert-primary text-start" role="alert">
                 <a href="http://127.0.0.1:3000/users/${message.username}">${message.username}</a> - ${new Date(message.date).toLocaleString()}
                 <br>
                 ${marked(message.msg)}
