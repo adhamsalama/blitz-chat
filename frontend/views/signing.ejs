@@ -52,7 +52,7 @@
                                 // Login successful
                                 if (response.status == 200) {
                                     console.log(response)
-                                    document.cookie = `token=${response.data}`
+                                    document.cookie = `jwttoken=${response.data};`
                                 }
                             })
                             .catch(err => console.log('Login error', err.response))
@@ -73,7 +73,7 @@
                     if (response.status == 200) {
                         console.log(response)
                         // Store JWT
-                        document.cookie = `jwttoken=${response.data}`
+                        document.cookie = `jwttoken=${response.data};`
                         document.location = 'http://127.0.0.1:3000'
                     }
                 })
