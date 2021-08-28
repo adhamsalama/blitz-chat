@@ -2,8 +2,20 @@
 
     <h1 id="username"></h1>
     <h2 id="email"></h2>
-    <button id="add-friend" class="btn btn-primary">Add Friend</button>
+    <h2>Messages</h2>
+    <div id='chat'>
+    </div>
+    <form id="chat-form">
+        <textarea type="text" class="form-control mb-2" id="chatMessage" placeholder="Message"></textarea>
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+    <script src="http://127.0.0.1:3000/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.1.3/marked.min.js"
+        integrity="sha512-AD+GG1nJKO4Je/Q8QsY1gM9/7o1QjpGe9W2Lrg1oGtEID/RX8bMKKZGgw/KOODkPXL6j74c6eJWAhE/3F2kKjA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="http://127.0.0.1:3000/messages.js"></script>
+    <script src="http://127.0.0.1:3000/userMessage.js"></script>
     <script>
         const username = location.pathname.split('/')[2]
         axios.get(`http://127.0.0.1:3000/api/users/${username}`).then(res => {
@@ -11,10 +23,10 @@
             document.querySelector('#username').innerHTML = res.data.username
             document.querySelector('#email').innerHTML = res.data.email
         })
-        document.querySelector('#add-friend').onclick = () => {
-            axios.post(`http://127.0.0.1:3000/api/users/${username}/add-friend`)
-            .then(res => console.log(res))
-        }
+        // document.querySelector('#add-friend').onclick = () => {
+        //     axios.post(`http://127.0.0.1:3000/api/users/${username}/add-friend`)
+        //     .then(res => console.log(res))
+        // }
     </script>
 
 <%- include('_footer') %>
