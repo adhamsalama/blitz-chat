@@ -1,4 +1,3 @@
-
 let form = document.querySelector("#search-form");
 form.onsubmit = () => false;
 
