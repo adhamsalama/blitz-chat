@@ -4,6 +4,7 @@ const api = express.Router()
 const mongoose = require('mongoose')
 const User = require('../models/user')
 const Room = require('../models/room')
+const UserRoom = require('../models/userRoom')
 const { generateAccessToken, authenticateToken } = require('./auth')
 
 const to = require('await-to-js').default
@@ -89,14 +90,14 @@ api.get('/user-rooms', async (req, res) => {
 })
 
 api.get('/joined-rooms', async (req, res) => {
-    let rooms = await Room.find({users: req.user.username})
+    let rooms = await Room.find({ users: req.user.username })
     console.log(rooms)
-    res.json({rooms: rooms})
+    res.json({ rooms: rooms })
 })
 
 api.get('/rooms/search', async (req, res) => {
     let q = req.query['q']
-    const rooms = await Room.find({ name: { $regex: q, $options: 'i' } }).select('name description -_id')
+    const rooms = await Room.find({ name: { $regex: q, $options: 'i' }, type: 'public' }).select('name description -_id')
     res.json(rooms)
 })
 
@@ -129,7 +130,6 @@ api.post('/rooms', async (req, res) => {
 api.get('/users/:username', async (req, res) => {
     const username = req.params.username
     const user = await User.findOne({ username: username }).select('username email -_id')
-    console.log(user)
     res.json(user)
 })
 
@@ -150,7 +150,7 @@ api.post('/admin-command', async (req, res) => {
             return res.status(401).json({ message: 'User already added to room.' })
         room.users.push(user.username)
         room.save()
-        return res.status(200).json({message: 'User added successfully.'})
+        return res.status(200).json({ message: 'User added successfully.' })
     }
     if (req.body.command == 'delete') {
         let userIndex = room.users.indexOf(user.username)
@@ -159,7 +159,7 @@ api.post('/admin-command', async (req, res) => {
             return res.status(401).json({ message: 'User not in room.' })
         room.users.splice(userIndex, 1)
         room.save()
-        return res.status(200).json({message: 'User removed successfully.'})
+        return res.status(200).json({ message: 'User removed successfully.' })
     }
 
     res.sendStatus(403)
@@ -221,7 +221,32 @@ module.exports = (io) => {
                 socket.broadcast.to(room).emit('userTyping', username)
             })
         })
+        socket.on('joinUser', async ({ firstUser, secondUser }) => {
+            let userToUser = [firstUser, secondUser].sort().join('-')
+            socket.broadcast.to(userToUser).emit('serverMessage', `${firstUser} has joined the chat`)
+            socket.join(userToUser)
+            // Find the document
+            let thisRoom = await UserRoom.findOne({name: userToUser})
+            if (!thisRoom)
+                thisRoom = new UserRoom({
+                    name: userToUser,
+                    users: [firstUser, secondUser]
+                })
+            console.log(userToUser)
+            socket.emit('getRoomMessages', thisRoom.messages)
 
+            socket.on('userMessage', (message) => {
+                io.to(userToUser).emit('userMessage', message)
+                thisRoom.messages.push(message)
+                thisRoom.save()
+                console.log(thisRoom.messages)
+            })
+            socket.on('disconnect', () => {
+                console.log('aaa')
+                io.to(userToUser).emit('serverMessage', `${firstUser} has left the chat`)
+
+            })
+        })
 
     })
     return api
