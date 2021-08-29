@@ -10,14 +10,14 @@ function outputChatMessage(message, currentUsername) {
         chat.innerHTML += `<div class="alert alert-success text-end" role="alert">
                 <a href="https://blitzchatapp.herokuapp.com/users/${message.username}">Me</a> - ${new Date(message.date).toLocaleString()}
                 <br>
-                ${marked(message.msg)}
+                ${DOMPurify.sanitize(marked(message.msg), {USE_PROFILES: {html: true}})}
             </div>`
     }
     else {
         chat.innerHTML += `<div class="alert alert-primary text-start" role="alert">
                 <a href="https://blitzchatapp.herokuapp.com/users/${message.username}">${message.username}</a> - ${new Date(message.date).toLocaleString()}
                 <br>
-                ${marked(message.msg)}
+                ${DOMPurify.sanitize(marked(message.msg), {USE_PROFILES: {html: true}})}
             </div>`
     
     }
