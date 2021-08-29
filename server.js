@@ -13,7 +13,7 @@ const server = http.createServer(app)
 const io = socketio(server)
 const api = require('./api/api')(io)
 
-mongoose.connect('mongodb://localhost:27017/chatter', {
+mongoose.connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true
