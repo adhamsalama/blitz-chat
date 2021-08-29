@@ -225,26 +225,21 @@ module.exports = (io) => {
             let userToUser = [firstUser, secondUser].sort().join('-')
             socket.broadcast.to(userToUser).emit('serverMessage', `${firstUser} has joined the chat`)
             socket.join(userToUser)
-            // Find the document
             let thisRoom = await UserRoom.findOne({name: userToUser})
             if (!thisRoom)
                 thisRoom = new UserRoom({
                     name: userToUser,
                     users: [firstUser, secondUser]
                 })
-            console.log(userToUser)
             socket.emit('getRoomMessages', thisRoom.messages)
 
             socket.on('userMessage', (message) => {
                 io.to(userToUser).emit('userMessage', message)
                 thisRoom.messages.push(message)
                 thisRoom.save()
-                console.log(thisRoom.messages)
             })
             socket.on('disconnect', () => {
-                console.log('aaa')
                 io.to(userToUser).emit('serverMessage', `${firstUser} has left the chat`)
-
             })
         })
 

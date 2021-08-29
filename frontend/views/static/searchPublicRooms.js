@@ -7,7 +7,7 @@ searchField.oninput = () => {
 }
 
 function searchPublicRooms(roomName) {
-    axios.get(`http://127.0.0.1:3000/api/rooms/search?q=${roomName}`).then(rooms => {
+    axios.get(`https://blitzchatapp.herokuapp.com/api/rooms/search?q=${roomName}`).then(rooms => {
         // Display Rooms
         let newRooms = ''
         rooms.data.forEach(room => {

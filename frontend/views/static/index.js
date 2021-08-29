@@ -4,7 +4,7 @@ document.querySelector('#create-room').addEventListener('submit', e => {
     let type = document.querySelector('#room-type')
     let description = document.querySelector('#room-description')
     let tags = document.querySelector('#room-tags')
-    axios.post('http://127.0.0.1:3000/api/rooms', {
+    axios.post('https://blitzchatapp.herokuapp.com/api/rooms', {
         name: name.value,
         type: type.value,
         description: description.value,
@@ -23,19 +23,19 @@ document.querySelector('#create-room').addEventListener('submit', e => {
 })
 
 // Get and display user rooms
-axios.get('http://127.0.0.1:3000/api/user-rooms', { withCredentials: true })
+axios.get('https://blitzchatapp.herokuapp.com/api/user-rooms', { withCredentials: true })
     .then(res => {
         document.querySelector('#user-rooms').innerHTML = displayRooms(res.data.rooms)
     })
 
 // Get and display joined rooms
-axios.get('http://127.0.0.1:3000/api/joined-rooms', { withCredentials: true })
+axios.get('https://blitzchatapp.herokuapp.com/api/joined-rooms', { withCredentials: true })
     .then(res => {
         document.querySelector('#joined-rooms').innerHTML = displayRooms(res.data.rooms)
     })
 
 // Get and display public rooms
-axios.get('http://127.0.0.1:3000/api/rooms', { withCredentials: true })
+axios.get('https://blitzchatapp.herokuapp.com/api/rooms', { withCredentials: true })
     .then(res => {
         document.querySelector('#public-rooms').innerHTML = displayRooms(res.data.rooms)
     })

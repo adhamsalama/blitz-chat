@@ -8,14 +8,14 @@ function outputChatMessage(message, currentUsername) {
     // This user sent it
     if (message.username == currentUsername) {
         chat.innerHTML += `<div class="alert alert-success text-end" role="alert">
-                <a href="http://127.0.0.1:3000/users/${message.username}">Me</a> - ${new Date(message.date).toLocaleString()}
+                <a href="https://blitzchatapp.herokuapp.com/users/${message.username}">Me</a> - ${new Date(message.date).toLocaleString()}
                 <br>
                 ${marked(message.msg)}
             </div>`
     }
     else {
         chat.innerHTML += `<div class="alert alert-primary text-start" role="alert">
-                <a href="http://127.0.0.1:3000/users/${message.username}">${message.username}</a> - ${new Date(message.date).toLocaleString()}
+                <a href="https://blitzchatapp.herokuapp.com/users/${message.username}">${message.username}</a> - ${new Date(message.date).toLocaleString()}
                 <br>
                 ${marked(message.msg)}
             </div>`

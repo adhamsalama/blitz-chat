@@ -74,7 +74,7 @@
                         console.log(response)
                         // Store JWT
                         document.cookie = `jwttoken=${response.data};`
-                        document.location = 'http://127.0.0.1:3000'
+                        document.location = 'https://blitzchatapp.herokuapp.com'
                     }
                 })
                 .catch(err => console.log('Login error', err.response))
