@@ -4,7 +4,7 @@
   "description": "An online chat web app.",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server"
+    "start": "node server"
   },
   "author": "Adham Salama",
   "license": "ISC",
@@ -23,5 +23,8 @@
     "morgan": "^1.10.0",
     "session": "^0.1.0",
     "socket.io": "^4.1.3"
+  },
+  "engines": {
+    "node": "12.21.0"
   }
 }
