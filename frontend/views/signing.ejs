@@ -53,6 +53,7 @@
                                 if (response.status == 200) {
                                     console.log(response)
                                     document.cookie = `jwttoken=${response.data};`
+                                    window.location.pathname = ""
                                 }
                             })
                             .catch(err => console.log('Login error', err.response))
